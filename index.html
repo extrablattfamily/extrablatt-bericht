@@ -3820,3 +3820,88 @@ bereiche.forEach((bereich, index) => {
 })();
 </script>
 
+<style>
+/* Buffetstationen als einzelne Klappkarten */
+#buffet-kontrolle .buffet-station {
+  border: 2px solid #C8102E;
+  border-radius: 12px;
+  margin: 12px 0;
+  padding: 0;
+  background: white;
+  overflow: hidden;
+}
+
+#buffet-kontrolle .buffet-station > summary {
+  padding: 16px;
+  font-size: 17px;
+  font-weight: bold;
+  color: #222;
+  cursor: pointer;
+  list-style: none;
+}
+
+#buffet-kontrolle .buffet-station > summary::after {
+  content: "＋";
+  float: right;
+  color: #C8102E;
+}
+
+#buffet-kontrolle .buffet-station[open] > summary {
+  background: #FFF2F4;
+  border-bottom: 1px solid #C8102E;
+}
+
+#buffet-kontrolle .buffet-station[open] > summary::after {
+  content: "−";
+}
+
+#buffet-kontrolle .buffet-station .buffet-inhalt {
+  padding: 12px;
+}
+
+@media print {
+  #buffet-kontrolle .buffet-station > summary {
+    display: none !important;
+  }
+}
+</style>
+
+<script>
+(function () {
+  const stationen = document.querySelectorAll(
+    "#buffet-kontrolle .buffet-station"
+  );
+
+  stationen.forEach(station => {
+    if (station.tagName === "DETAILS") return;
+
+    const titel = station.querySelector(":scope > h3");
+    if (!titel) return;
+
+    const details = document.createElement("details");
+    details.className = station.className;
+
+    const summary = document.createElement("summary");
+    summary.textContent = titel.textContent;
+
+    const inhalt = document.createElement("div");
+    inhalt.className = "buffet-inhalt";
+
+    Array.from(station.children).forEach(element => {
+      if (element !== titel) {
+        inhalt.appendChild(element);
+      }
+    });
+
+    details.append(summary, inhalt);
+    station.replaceWith(details);
+  });
+
+  window.addEventListener("beforeprint", () => {
+    document.querySelectorAll(
+      "#buffet-kontrolle details"
+    ).forEach(el => el.open = true);
+  });
+})();
+</script>
+
