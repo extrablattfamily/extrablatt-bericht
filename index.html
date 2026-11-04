@@ -3168,3 +3168,148 @@ bereiche.forEach((bereich, index) => {
 }
 </style>
 
+<!-- BERICHT SCHRITT FÜR SCHRITT -->
+<style>
+#bericht-navigation {
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+  background: white;
+  padding: 12px;
+  border-top: 2px solid #C8102E;
+  box-shadow: 0 -3px 12px #00000015;
+}
+
+#bericht-navigation .nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+#bericht-navigation button {
+  flex: 1;
+  padding: 14px 8px;
+}
+
+#bericht-navigation .zurueck {
+  background: #444;
+}
+
+#bericht-fortschritt {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#bericht-auswahl {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+@media print {
+  #bericht-navigation {
+    display: none !important;
+  }
+}
+</style>
+
+<script>
+(function () {
+  const container = document.querySelector(".container");
+  if (!container) return;
+
+  const bereiche = Array.from(
+    container.querySelectorAll(":scope > section")
+  );
+
+  if (!bereiche.length) return;
+
+  let aktuell = 0;
+
+  const navigation = document.createElement("div");
+  navigation.id = "bericht-navigation";
+
+  const fortschritt = document.createElement("div");
+  fortschritt.id = "bericht-fortschritt";
+
+  const auswahl = document.createElement("select");
+  auswahl.id = "bericht-auswahl";
+
+  bereiche.forEach((bereich, index) => {
+    const option = document.createElement("option");
+    option.value = index;
+
+    const titel = bereich.querySelector("h2");
+    option.textContent = titel
+      ? titel.textContent.trim()
+      : "Bereich " + (index + 1);
+
+    auswahl.appendChild(option);
+  });
+
+  const buttons = document.createElement("div");
+  buttons.className = "nav-buttons";
+
+  const zurueck = document.createElement("button");
+  zurueck.type = "button";
+  zurueck.className = "zurueck";
+  zurueck.textContent = "← Zurück";
+
+  const weiter = document.createElement("button");
+  weiter.type = "button";
+  weiter.textContent = "Weiter →";
+
+  buttons.append(zurueck, weiter);
+  navigation.append(fortschritt, auswahl, buttons);
+
+  container.appendChild(navigation);
+
+  function anzeigen(index) {
+    aktuell = index;
+
+    bereiche.forEach((bereich, i) => {
+      bereich.style.display =
+        i === aktuell ? "block" : "none";
+    });
+
+    auswahl.value = aktuell;
+
+    fortschritt.textContent =
+      "Bereich " + (aktuell + 1) +
+      " von " + bereiche.length;
+
+    zurueck.disabled = aktuell === 0;
+
+    weiter.disabled =
+      aktuell === bereiche.length - 1;
+
+    weiter.textContent =
+      aktuell === bereiche.length - 1
+        ? "Fertig ✓"
+        : "Weiter →";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  weiter.addEventListener("click", () => {
+    if (aktuell < bereiche.length - 1) {
+      anzeigen(aktuell + 1);
+    }
+  });
+
+  zurueck.addEventListener("click", () => {
+    if (aktuell > 0) {
+      anzeigen(aktuell - 1);
+    }
+  });
+
+  auswahl.addEventListener("change", () => {
+    anzeigen(Number(auswahl.value));
+  });
+
+  anzeigen(0);
+})();
+</script>
+
