@@ -1001,17 +1001,7 @@ function erstelleBestellgruppe(titel, artikel) {
   return gruppe;
 }
 
-const bestellContainer = document.getElementById("bestelllisten");
 
-bestellContainer.appendChild(
-  erstelleBestellgruppe("Dekoration", dekoration)
-);
-bestellContainer.appendChild(
-  erstelleBestellgruppe("Hardware", hardware)
-);
-bestellContainer.appendChild(
-  erstelleBestellgruppe("Hardware von Rudi Wermers", rudiHardware)
-);
 </script>
 
 <section>
@@ -1211,22 +1201,48 @@ Object.entries(produktGruppen).forEach(([gruppe, produkte]) => {
   produktContainer.appendChild(bereich);
 });
 
-document.getElementById("produktSuche").addEventListener("input", function() {
-  const suche = this.value.toLowerCase().trim();
+
+const produktSuche = document.getElementById("produktSuche");
+
+function produktListeFiltern() {
+  const suche = produktSuche.value.toLowerCase().trim();
 
   document.querySelectorAll(".produkt-zeile").forEach(zeile => {
-    zeile.style.display = zeile.dataset.suche.includes(suche)
-      ? ""
-      : "none";
+    const checkbox = zeile.querySelector('input[type="checkbox"]');
+
+    const passtZurSuche =
+      suche !== "" &&
+      zeile.dataset.suche.includes(suche);
+
+    zeile.style.display =
+      (checkbox.checked || passtZurSuche)
+        ? ""
+        : "none";
   });
 
-  document.querySelectorAll("#produktListen .bestell-gruppe").forEach(gruppe => {
-    const sichtbar = [...gruppe.querySelectorAll(".produkt-zeile")]
-      .some(zeile => zeile.style.display !== "none");
+  document.querySelectorAll("#produktListen .bestell-gruppe")
+    .forEach(gruppe => {
+      const sichtbar = [...gruppe.querySelectorAll(".produkt-zeile")]
+        .some(zeile => zeile.style.display !== "none");
 
-    gruppe.style.display = sichtbar ? "" : "none";
+      gruppe.style.display = sichtbar ? "" : "none";
+
+      const sonstiges = gruppe.querySelector("textarea:last-child");
+      if (sonstiges && sonstiges.value.trim()) {
+        gruppe.style.display = "";
+      }
+    });
+}
+
+produktSuche.addEventListener("input", produktListeFiltern);
+
+document.querySelectorAll(".produkt-zeile input[type='checkbox']")
+  .forEach(checkbox => {
+    checkbox.addEventListener("change", produktListeFiltern);
   });
-});
+
+produktListeFiltern();
+
 </script>
 
 <section>
