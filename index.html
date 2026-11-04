@@ -533,12 +533,21 @@ Object.entries(buffetStationen).forEach(([station, punkte]) => {
     beschreibung.textContent = punkt;
 
     const auswahl = document.createElement("select");
-    [
-      ["", "Bitte auswählen"],
-      ["OK", "OK"],
-      ["Nicht OK", "Nicht OK"],
-      ["Nicht zutreffend", "Nicht zutreffend"]
-    ].forEach(([wert, text]) => {
+    
+[
+  ["", "Bitte auswählen"],
+  ["Standard eingehalten", "Standard eingehalten"],
+  ["Standard nicht eingehalten", "Standard nicht eingehalten"],
+  ["Beschädigt / kaputt", "Beschädigt / kaputt"],
+  ["Gerissen", "Gerissen"],
+  ["Nicht vorhanden", "Nicht vorhanden"],
+  ["Fehlt auf dem Buffet", "Fehlt auf dem Buffet"],
+  ["Nicht richtig präsentiert", "Nicht richtig präsentiert"],
+  ["Falscher Artikel", "Falscher Artikel / falsches Geschirr"],
+  ["Nicht sauber", "Nicht sauber"],
+  ["Nicht zutreffend", "Nicht zutreffend"]
+]
+.forEach(([wert, text]) => {
       const option = document.createElement("option");
       option.value = wert;
       option.textContent = text;
