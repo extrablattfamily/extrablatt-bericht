@@ -3702,3 +3702,121 @@ bereiche.forEach((bereich, index) => {
 }
 </style>
 
+<style>
+/* Unterbereiche als aufklappbare Karten */
+.extrablatt-unterbereich {
+  border: 2px solid #C8102E;
+  border-radius: 12px;
+  margin: 12px 0;
+  overflow: hidden;
+  background: white;
+}
+
+.extrablatt-unterbereich > summary {
+  padding: 16px;
+  color: #222;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  list-style: none;
+}
+
+.extrablatt-unterbereich > summary::after {
+  content: "＋";
+  float: right;
+  color: #C8102E;
+}
+
+.extrablatt-unterbereich[open] > summary::after {
+  content: "−";
+}
+
+.extrablatt-unterbereich[open] > summary {
+  background: #FFF2F4;
+  border-bottom: 1px solid #C8102E;
+}
+
+.extrablatt-unterbereich > .unterbereich-inhalt {
+  padding: 12px;
+}
+
+@media print {
+  .extrablatt-unterbereich > summary {
+    display: none !important;
+  }
+}
+</style>
+
+<script>
+(function () {
+  const container = document.querySelector(".container");
+  if (!container) return;
+
+  const bereiche = Array.from(
+    container.querySelectorAll(":scope > section")
+  );
+
+  bereiche.forEach(bereich => {
+    if (bereich.dataset.unterbereicheFertig) return;
+
+    const titel = bereich.querySelector(":scope > h2");
+    if (!titel) return;
+
+    // Die Unterbereiche anhand der H3-Titel aufteilen
+    const elemente = Array.from(bereich.children);
+    const untertitel = elemente.filter(el =>
+      el.tagName === "H3"
+    );
+
+    if (untertitel.length < 2) return;
+
+    const fragmente = [];
+    let aktuell = null;
+
+    elemente.forEach(el => {
+      if (el.tagName === "H3") {
+        aktuell = document.createElement("details");
+        aktuell.className = "extrablatt-unterbereich";
+
+        const summary = document.createElement("summary");
+        summary.textContent = el.textContent;
+
+        const inhalt = document.createElement("div");
+        inhalt.className = "unterbereich-inhalt";
+
+        aktuell.append(summary, inhalt);
+        fragmente.push(aktuell);
+        el.remove();
+      } else if (aktuell) {
+        aktuell.querySelector(".unterbereich-inhalt")
+          .appendChild(el);
+      }
+    });
+
+    fragmente.forEach(fragment => {
+      bereich.appendChild(fragment);
+    });
+
+    bereich.dataset.unterbereicheFertig = "ja";
+  });
+
+  // Beim Drucken alle Unterbereiche öffnen
+  window.addEventListener("beforeprint", () => {
+    document.querySelectorAll(
+      ".extrablatt-unterbereich"
+    ).forEach(el => {
+      el.dataset.vorDruckOffen = el.open ? "ja" : "nein";
+      el.open = true;
+    });
+  });
+
+  window.addEventListener("afterprint", () => {
+    document.querySelectorAll(
+      ".extrablatt-unterbereich"
+    ).forEach(el => {
+      el.open = el.dataset.vorDruckOffen === "ja";
+    });
+  });
+})();
+</script>
+
