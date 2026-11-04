@@ -3046,3 +3046,125 @@ bereiche.forEach((bereich, index) => {
 
 })();
 </script>
+
+<!-- FOTOS IN PDF-BERICHT ÜBERNEHMEN -->
+<script>
+(function () {
+
+  const pdfButton = document.getElementById("bericht-pdf-button");
+
+  if (!pdfButton) return;
+
+  // Wird nach dem bisherigen PDF-Code ausgeführt
+  pdfButton.addEventListener("click", function () {
+
+    const pdf = document.getElementById("pdf-ausgabe");
+    if (!pdf) return;
+
+    const bereiche = document.querySelectorAll(
+      ".container > section"
+    );
+
+    const pdfAbschnitte = pdf.querySelectorAll(
+      ".pdf-abschnitt"
+    );
+
+    // Fotos dem richtigen Berichtbereich zuordnen
+    bereiche.forEach(function (bereich) {
+
+      const fotos = bereich.querySelectorAll(
+        ".foto-karte"
+      );
+
+      if (!fotos.length) return;
+
+      const bereichTitel = bereich.querySelector("h2");
+      if (!bereichTitel) return;
+
+      const titelText = bereichTitel.textContent.trim();
+
+      let ziel = Array.from(pdfAbschnitte).find(function (abschnitt) {
+        const titel = abschnitt.querySelector("h2");
+        return titel && titel.textContent.trim() === titelText;
+      });
+
+      // Bereich erstellen, falls noch nicht im PDF vorhanden
+      if (!ziel) {
+        ziel = document.createElement("div");
+        ziel.className = "pdf-abschnitt";
+
+        const h2 = document.createElement("h2");
+        h2.textContent = titelText;
+        ziel.appendChild(h2);
+
+        pdf.appendChild(ziel);
+      }
+
+      const fotoTitel = document.createElement("h3");
+      fotoTitel.textContent = "Fotodokumentation";
+      ziel.appendChild(fotoTitel);
+
+      fotos.forEach(function (karte, index) {
+
+        const originalBild = karte.querySelector("img");
+        const beschreibung = karte.querySelector("textarea");
+
+        if (!originalBild) return;
+
+        const fotoBox = document.createElement("div");
+        fotoBox.className = "pdf-foto-box";
+
+        const bild = document.createElement("img");
+        bild.src = originalBild.src;
+        bild.className = "pdf-foto";
+
+        const text = document.createElement("p");
+        const notiz = beschreibung
+          ? beschreibung.value.trim()
+          : "";
+
+        text.textContent = notiz
+          ? "Foto " + (index + 1) + ": " + notiz
+          : "Foto " + (index + 1);
+
+        fotoBox.append(bild, text);
+        ziel.appendChild(fotoBox);
+
+      });
+
+    });
+
+  });
+
+})();
+</script>
+
+<style>
+@media print {
+
+  .pdf-foto-box {
+    margin: 15px 0 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .pdf-foto {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    max-height: 110mm;
+    object-fit: contain;
+    margin: 0 auto;
+  }
+
+  .pdf-foto-box p {
+    font-size: 11px;
+    margin: 8px 0 0;
+    overflow-wrap: anywhere;
+  }
+
+}
+</style>
+
