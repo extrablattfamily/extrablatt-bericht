@@ -637,25 +637,7 @@ Object.entries(buffetStationen).forEach(([station, punkte]) => {
   // Hier kommen die echten Artikel aus
   // deiner vorhandenen Artikelliste hinein.
   
-const artikelKatalog = [
-  ...dekoration.map(([name, nummer]) => ({
-    name,
-    nummer,
-    kategorie: "Dekoration"
-  })),
 
-  ...hardware.map(([name, nummer]) => ({
-    name,
-    nummer,
-    kategorie: "Hardware"
-  })),
-
-  ...rudiHardware.map(([name, nummer]) => ({
-    name,
-    nummer,
-    kategorie: "Rudi Hardware"
-  }))
-];
 
 
   const suche = document.getElementById("bestell-suche");
@@ -703,7 +685,7 @@ const artikelKatalog = [
     const text = suche.value.trim().toLowerCase();
     if (!text) return;
 
-    const ergebnisse = artikelKatalog.filter(artikel =>
+    const ergebnisse = window.artikelKatalog.filter(artikel =>
       artikel.name.toLowerCase().includes(text) ||
       String(artikel.nummer || "").toLowerCase().includes(text)
     ).slice(0, 30);
@@ -944,6 +926,18 @@ const rudiHardware = [
 ["Dreier-UFO",""],
 ["Runde Platten",""],
 ["Wanne rund",""]
+];
+
+window.artikelKatalog = [
+  ...dekoration.map(([name, nummer]) => ({
+    name, nummer, kategorie: "Dekoration"
+  })),
+  ...hardware.map(([name, nummer]) => ({
+    name, nummer, kategorie: "Hardware"
+  })),
+  ...rudiHardware.map(([name, nummer]) => ({
+    name, nummer, kategorie: "Rudi Hardware"
+  }))
 ];
 
 function erstelleBestellgruppe(titel, artikel) {
