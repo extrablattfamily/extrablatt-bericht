@@ -3563,3 +3563,47 @@ bereiche.forEach((bereich, index) => {
 })();
 </script>
 
+<script>
+(function () {
+  function aktualisieren() {
+    const suche = document.getElementById("produktSuche");
+    const liste = document.getElementById("produktListen");
+    if (!suche || !liste) return;
+
+    const text = suche.value.trim().toLowerCase();
+
+    liste.querySelectorAll(".produkt-zeile").forEach(zeile => {
+      const checkbox = zeile.querySelector('input[type="checkbox"]');
+      const ausgewaehlt = checkbox && checkbox.checked;
+      const gefunden = text !== "" &&
+        (zeile.dataset.suche || "").includes(text);
+
+      zeile.style.setProperty(
+        "display",
+        ausgewaehlt || gefunden ? "" : "none",
+        "important"
+      );
+    });
+
+    liste.querySelectorAll(".bestell-gruppe").forEach(gruppe => {
+      const sichtbar = [...gruppe.querySelectorAll(".produkt-zeile")]
+        .some(zeile => zeile.style.display !== "none");
+
+      gruppe.style.setProperty(
+        "display",
+        sichtbar ? "" : "none",
+        "important"
+      );
+    });
+  }
+
+  document.getElementById("produktSuche")
+    ?.addEventListener("input", aktualisieren);
+
+  document.getElementById("produktListen")
+    ?.addEventListener("change", aktualisieren);
+
+  aktualisieren();
+})();
+</script>
+
