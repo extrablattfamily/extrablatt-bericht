@@ -636,7 +636,27 @@ Object.entries(buffetStationen).forEach(([station, punkte]) => {
 (function () {
   // Hier kommen die echten Artikel aus
   // deiner vorhandenen Artikelliste hinein.
-  const artikelKatalog = [];
+  
+const artikelKatalog = [
+  ...dekoration.map(([name, nummer]) => ({
+    name,
+    nummer,
+    kategorie: "Dekoration"
+  })),
+
+  ...hardware.map(([name, nummer]) => ({
+    name,
+    nummer,
+    kategorie: "Hardware"
+  })),
+
+  ...rudiHardware.map(([name, nummer]) => ({
+    name,
+    nummer,
+    kategorie: "Rudi Hardware"
+  }))
+];
+
 
   const suche = document.getElementById("bestell-suche");
   const treffer = document.getElementById("bestell-treffer");
