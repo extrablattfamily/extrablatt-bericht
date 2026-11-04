@@ -685,7 +685,7 @@ Object.entries(buffetStationen).forEach(([station, punkte]) => {
     const text = suche.value.trim().toLowerCase();
     if (!text) return;
 
-    const ergebnisse = window.artikelKatalog.filter(artikel =>
+    const ergebnisse = window.artikelKatalog.filter(artikel => 
       artikel.name.toLowerCase().includes(text) ||
       String(artikel.nummer || "").toLowerCase().includes(text)
     ).slice(0, 30);
