@@ -575,6 +575,139 @@ Object.entries(buffetStationen).forEach(([station, punkte]) => {
 
 <div id="bestelllisten"></div>
 
+<style>
+#bestell-suche {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+#bestell-treffer {
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.bestell-treffer-zeile {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 5px 0;
+  text-align: left;
+  background: #f5f5f5;
+  color: #222;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+}
+
+.bestell-eintrag {
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-left: 4px solid #C8102E;
+  border-radius: 8px;
+}
+
+.bestell-eintrag input {
+  width: 90px;
+  padding: 8px;
+}
+
+@media print {
+  #bestell-suche,
+  #bestell-treffer,
+  .bestell-entfernen {
+    display: none !important;
+  }
+}
+</style>
+
+<div id="bestell-suche-bereich">
+  <h3>Artikel suchen / hinzufügen</h3>
+  <input id="bestell-suche"
+    type="search"
+    placeholder="Artikelname oder Artikelnummer suchen...">
+
+  <div id="bestell-treffer"></div>
+</div>
+
+<script>
+(function () {
+  // Hier kommen die echten Artikel aus
+  // deiner vorhandenen Artikelliste hinein.
+  const artikelKatalog = [];
+
+  const suche = document.getElementById("bestell-suche");
+  const treffer = document.getElementById("bestell-treffer");
+  const liste = document.getElementById("bestelllisten");
+
+  if (!suche || !treffer || !liste) return;
+
+  function artikelHinzufuegen(artikel) {
+    const eintrag = document.createElement("div");
+    eintrag.className = "bestell-eintrag";
+
+    const name = document.createElement("strong");
+    name.textContent = artikel.name;
+
+    const nummer = document.createElement("p");
+    nummer.textContent =
+      "Artikelnummer: " + (artikel.nummer || "Nicht hinterlegt");
+
+    const mengenLabel = document.createElement("label");
+    mengenLabel.textContent = "Bestellmenge: ";
+
+    const menge = document.createElement("input");
+    menge.type = "number";
+    menge.min = "1";
+    menge.value = "1";
+    mengenLabel.appendChild(menge);
+
+    const entfernen = document.createElement("button");
+    entfernen.type = "button";
+    entfernen.className = "bestell-entfernen";
+    entfernen.textContent = "Entfernen";
+    entfernen.onclick = () => eintrag.remove();
+
+    eintrag.append(name, nummer, mengenLabel, entfernen);
+    liste.appendChild(eintrag);
+
+    suche.value = "";
+    treffer.replaceChildren();
+  }
+
+  suche.addEventListener("input", function () {
+    treffer.replaceChildren();
+
+    const text = suche.value.trim().toLowerCase();
+    if (!text) return;
+
+    const ergebnisse = artikelKatalog.filter(artikel =>
+      artikel.name.toLowerCase().includes(text) ||
+      String(artikel.nummer || "").toLowerCase().includes(text)
+    ).slice(0, 30);
+
+    ergebnisse.forEach(artikel => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "bestell-treffer-zeile";
+      button.textContent =
+        artikel.name + " – Art.-Nr. " +
+        (artikel.nummer || "Nicht hinterlegt");
+
+      button.onclick = () => artikelHinzufuegen(artikel);
+      treffer.appendChild(button);
+    });
+
+    if (!ergebnisse.length) {
+      treffer.textContent = "Kein Artikel gefunden.";
+    }
+  });
+})();
+</script>
+
+
 <h3>Sonstiges – Nachbestellung</h3>
 <textarea placeholder="Weitere fehlende Artikel, Hinweise oder Bestellwünsche..."></textarea>
 </section>
