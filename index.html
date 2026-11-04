@@ -459,6 +459,51 @@ footer {
     max-height: 100mm;
   }
 }
+
+/* EXTRABLATT WILLKOMMENSSEITE */
+
+#extrablatt-welcome {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.welcome-card {
+  width: 100%;
+  max-width: 520px;
+  min-height: min(780px, 92dvh);
+  border-radius: 20px;
+  background-image: url("A4C64F3F-15B6-41A4-8C9B-D6611290ABD3.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: white;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 25px;
+}
+
+.welcome-start {
+  background: #C8102E;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 16px 35px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 5px 15px #0003;
+  position: relative;
+  z-index: 2;
+}
+
 </style>
 </head>
 
