@@ -3412,91 +3412,148 @@ bereiche.forEach((bereich, index) => {
 
   let aktuell = 0;
 
-  const navigation = document.createElement("div");
-  navigation.id = "bericht-navigation";
+  
+  // EXTRABLATT DASHBOARD
+  const dashboard = document.createElement("div");
+  dashboard.id = "extrablatt-dashboard";
 
-  const fortschritt = document.createElement("div");
-  fortschritt.id = "bericht-fortschritt";
+  dashboard.innerHTML = `
+    <h2>📋 Betriebsbesuchsbericht</h2>
+    <p>Bitte einen Bereich auswählen</p>
+    <div id="dashboard-karten"></div>
+  `;
 
-  const auswahl = document.createElement("select");
-  auswahl.id = "bericht-auswahl";
+  container.insertBefore(dashboard, bereiche[0]);
 
-  bereiche.forEach((bereich, index) => {
-    const option = document.createElement("option");
-    option.value = index;
+  const karten = dashboard.querySelector("#dashboard-karten");
 
-    const titel = bereich.querySelector("h2");
-    option.textContent = titel
-      ? titel.textContent.trim()
-      : "Bereich " + (index + 1);
+  const gruppen = [
+    ["Allgemeine Angaben", [0, 1]],
+    ["Erster Eindruck", [2, 3]],
+    ["Buffet", [4, 5]],
+    ["Küche", [6, 7]],
+    ["Lager", [8]],
+    ["Zahlen", [9]],
+    ["WC", [10]],
+    ["Fazit & Maßnahmen", [11]],
+    ["PDF-Bericht", [12]]
+  ];
 
-    auswahl.appendChild(option);
-  });
+  const style = document.createElement("style");
+  style.textContent = `
+    #extrablatt-dashboard {
+      padding: 20px 0;
+    }
 
-  const buttons = document.createElement("div");
-  buttons.className = "nav-buttons";
+    #extrablatt-dashboard h2 {
+      color: #C8102E;
+      text-align: center;
+    }
+
+    #dashboard-karten {
+      display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .dashboard-karte {
+      background: white;
+      color: #222;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      padding: 20px 10px;
+      font-size: 16px;
+      font-weight: bold;
+      min-height: 95px;
+      cursor: pointer;
+    }
+
+    .dashboard-karte:active {
+      border-color: #C8102E;
+    }
+
+    #dashboard-zurueck {
+      display: none;
+      position: sticky;
+      bottom: 12px;
+      width: 100%;
+      z-index: 100;
+      background: #C8102E;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 15px;
+      font-size: 16px;
+      margin-top: 15px;
+    }
+
+    @media print {
+      #extrablatt-dashboard,
+      #dashboard-zurueck {
+        display: none !important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
 
   const zurueck = document.createElement("button");
+  zurueck.id = "dashboard-zurueck";
   zurueck.type = "button";
-  zurueck.className = "zurueck";
-  zurueck.textContent = "← Zurück";
+  zurueck.textContent = "← Zur Übersicht";
+  container.appendChild(zurueck);
 
-  const weiter = document.createElement("button");
-  weiter.type = "button";
-  weiter.textContent = "Weiter →";
-
-  buttons.append(zurueck, weiter);
-  navigation.append(fortschritt, auswahl, buttons);
-
-  container.appendChild(navigation);
-
-  function anzeigen(index) {
-    aktuell = index;
-
-    bereiche.forEach((bereich, i) => {
-      bereich.style.display =
-        i === aktuell ? "block" : "none";
+  function startseite() {
+    bereiche.forEach(bereich => {
+      bereich.style.display = "none";
     });
 
-    auswahl.value = aktuell;
-
-    fortschritt.textContent =
-      "Bereich " + (aktuell + 1) +
-      " von " + bereiche.length;
-
-    zurueck.disabled = aktuell === 0;
-
-    weiter.disabled =
-      aktuell === bereiche.length - 1;
-
-    weiter.textContent =
-      aktuell === bereiche.length - 1
-        ? "Fertig ✓"
-        : "Weiter →";
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
+    dashboard.style.display = "block";
+    zurueck.style.display = "none";
+    window.scrollTo(0, 0);
   }
 
-  weiter.addEventListener("click", () => {
-    if (aktuell < bereiche.length - 1) {
-      anzeigen(aktuell + 1);
-    }
+  function gruppeOeffnen(indizes) {
+    dashboard.style.display = "none";
+
+    bereiche.forEach((bereich, index) => {
+      bereich.style.display =
+        indizes.includes(index) ? "block" : "none";
+    });
+
+    zurueck.style.display = "block";
+    window.scrollTo(0, 0);
+  }
+
+  gruppen.forEach(([name, indizes]) => {
+    const karte = document.createElement("button");
+    karte.type = "button";
+    karte.className = "dashboard-karte";
+    karte.textContent = name + " →";
+
+    karte.addEventListener("click", () => {
+      gruppeOeffnen(indizes);
+    });
+
+    karten.appendChild(karte);
   });
 
-  zurueck.addEventListener("click", () => {
-    if (aktuell > 0) {
-      anzeigen(aktuell - 1);
-    }
+  zurueck.addEventListener("click", startseite);
+
+  // Beim Drucken alle Berichtsbereiche freigeben
+  window.addEventListener("beforeprint", () => {
+    bereiche.forEach(bereich => {
+      bereich.style.display = "block";
+    });
   });
 
-  auswahl.addEventListener("change", () => {
-    anzeigen(Number(auswahl.value));
+  window.addEventListener("afterprint", () => {
+    startseite();
   });
 
-  anzeigen(0);
+  startseite();
+
 })();
 </script>
 
